@@ -1,0 +1,113 @@
+# Types
+
+type User {
+  id: ID!
+  username: String!
+  articles: [Article!]!
+  comments: [Comment!]!
+  likes: [Article!]!
+}
+
+type Article {
+  id: ID!
+  createdAt: String!
+  title: String!
+  content: String!
+  author: User!
+  tags: [Tag!]!
+  likes: [User!]!
+  comments: [Comment!]!
+}
+
+type Comment {
+  id: ID!
+  content: String!
+  author: User!
+  article: Article!
+}
+
+type Tag {
+  label: ID!
+  articles: [Article!]!
+}
+
+type Like {
+  user: User!
+  article: Article!
+}
+
+type NotAuthorized {
+  reason: String
+}
+
+# Queries and mutations
+
+input UserInput {
+  id: ID!
+}
+extend type Query {
+  user(input: UserInput!): UserResult!
+}
+union UserResult = User | NotAuthorized
+
+input ArticleInput {
+  id: ID!
+}
+extend type Query {
+  article(input: ArticleInput!): ArticleResult!
+}
+union ArticleResult = Article | NotAuthorized
+
+input CreateUserInput {
+  username: String!
+}
+extend type Mutation {
+  createUser(input: CreateUserInput!): CreateUserResult!
+}
+union CreateUserResult = User | NotAuthorized
+
+input PublishArticleInput {
+  title: String!
+  content: String!
+  tags: [Tag!]
+}
+extend type Mutation {
+  publishArticle(input: PublishArticleInput!): PublishArticleResult!
+}
+union PublishArticleResult = Article | NotAuthorized
+
+input TagArticleInput {
+  articleId: ID!
+  label: String!
+}
+extend type Mutation {
+  tagArticle(input: TagArticleInput!): TagArticleResult!
+}
+union TagArticleResult = Tag | NotAuthorized
+
+input UntagArticleInput {
+  articleId: ID!
+  label: String!
+}
+extend type Mutation {
+  untagArticle(input: UntagArticleInput!): UntagArticleResult!
+}
+union UntagArticleResult = Deleted | NotAuthorized
+
+input LikeArticleInput {
+  articleId: ID!
+  label: String!
+}
+extend type Mutation {
+  likeArticle(input: LikeArticleInput!): LikeArticleResult!
+}
+union LikeArticleResult = Like | NotAuthorized
+
+input UnlikeArticleInput {
+  articleId: ID!
+  label: String!
+}
+extend type Mutation {
+  unlikeArticle(input: UnlikeArticleInput!): UnlikeArticleResult!
+}
+union UnlikeArticleResult = Deleted | NotAuthorized
