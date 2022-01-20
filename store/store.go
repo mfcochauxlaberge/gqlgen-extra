@@ -3,7 +3,10 @@ package store
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 func New() *Store {
@@ -14,7 +17,9 @@ func New() *Store {
 
 // Store ...
 type Store struct {
-	Conn *sql.DB
+	DB *sql.DB
+
+	Types map[string]Type
 }
 
 func (s *Store) Builder() *Query {
@@ -56,13 +61,64 @@ func FromContext(ctx context.Context) *Store {
 	return &Store{}
 }
 
-// Builder ...
-func Builder(ctx context.Context) *Query {
-	// if s, ok := ctx.Value(keyStore{}).(*Query); ok {
-	// 	return s
-	// }
+// With ...
+func With(ctx context.Context) *Query {
+	s := FromContext(ctx)
 
-	return &Query{}
+	fields := graphql.CollectAllFields(ctx)
+
+	cols := []string{}
+
+	table := "unknown"
+
+	fCtx := graphql.GetFieldContext(ctx)
+
+	fmt.Printf("fCtx = %+v\n", fCtx)
+	fmt.Printf("fCtx.Field.Name = %s\n", fCtx.Field.Name)
+	fmt.Printf("fCtx.Field.Definition.Type = %s\n", fCtx.Field.Definition.Type)
+
+	parentResolver := ""
+
+	if fCtx.Parent != nil && fCtx.Parent.Field.Field != nil {
+		parentResolver = fCtx.Parent.Field.Name
+		fmt.Printf("fCtx.Parent.Field = %+v\n", fCtx.Parent.Field)
+		fmt.Printf("fCtx.Parent.Field.Name = %s\n", fCtx.Parent.Field.Name)
+	}
+
+	if fCtx.Field.Name == "user" {
+		table = "users"
+	} else if fCtx.Field.Name == "articles" {
+		table = "articles"
+	}
+
+	fmt.Printf("table is %s\n", table)
+
+	for _, f := range fields {
+		if table == "users" && s.Types["user"].HasScalar(f) {
+			cols = append(cols, f)
+		}
+
+		if table == "articles" && s.Types["article"].HasScalar(f) {
+			cols = append(cols, f)
+		}
+	}
+
+	for i, c := range cols {
+		switch c {
+		case "createdAt":
+			cols[i] = "created_at"
+		}
+	}
+
+	qry := &Query{
+		Table:          table,
+		Columns:        cols,
+		currResolver:   fCtx.Field.Name,
+		parentResolver: parentResolver,
+		db:             s.DB,
+	}
+
+	return qry
 }
 
 type keyStore struct{}

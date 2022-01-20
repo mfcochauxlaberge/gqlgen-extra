@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/mfcochauxlaberge/gqlgen-extra/demo/graph/gen"
 	"github.com/mfcochauxlaberge/gqlgen-extra/demo/graph/model"
@@ -13,47 +14,55 @@ import (
 )
 
 func (r *articleResolver) Author(ctx context.Context, obj *model.Article) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return nil, nil
 }
 
 func (r *articleResolver) Comments(ctx context.Context, obj *model.Article) ([]model.Comment, error) {
-	panic(fmt.Errorf("not implemented"))
+	return nil, nil
 }
 
 func (r *commentResolver) Author(ctx context.Context, obj *model.Comment) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return nil, nil
 }
 
 func (r *commentResolver) Article(ctx context.Context, obj *model.Comment) (*model.Article, error) {
-	panic(fmt.Errorf("not implemented"))
+	return nil, nil
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (model.CreateUserResult, error) {
-	panic(fmt.Errorf("not implemented"))
+	return nil, nil
+}
+
+func (r *mutationResolver) PublishArticle(ctx context.Context, input model.PublishArticleInput) (model.PublishArticleResult, error) {
+	return nil, nil
+}
+
+func (r *mutationResolver) TagArticle(ctx context.Context, input model.TagArticleInput) (model.TagArticleResult, error) {
+	return nil, nil
+}
+
+func (r *mutationResolver) UntagArticle(ctx context.Context, input model.UntagArticleInput) (model.UntagArticleResult, error) {
+	return nil, nil
+}
+
+func (r *mutationResolver) LikeArticle(ctx context.Context, input model.LikeArticleInput) (model.LikeArticleResult, error) {
+	return nil, nil
+}
+
+func (r *mutationResolver) UnlikeArticle(ctx context.Context, input model.UnlikeArticleInput) (model.UnlikeArticleResult, error) {
+	return nil, nil
 }
 
 func (r *queryResolver) User(ctx context.Context, input model.UserInput) (model.UserResult, error) {
 	u := model.User{}
 
-	err := store.Builder(ctx).Select("col1", "col2").From("users").Into(&u)
+	err := store.With(ctx).GetOne(
+		store.ByID(input.ID),
+		store.Into(&u),
+	)
 	if err != nil {
 		return nil, err
 	}
-
-	// u := &model.User{
-	// 	ID:       "user1",
-	// 	Username: "user1",
-	// 	Articles: []model.Article{
-	// 		{
-	// 			ID:      "article1",
-	// 			Title:   "My Article",
-	// 			Content: "This is the content.",
-	// 			Author: &model.User{
-	// 				ID: "user1",
-	// 			},
-	// 		},
-	// 	},
-	// }
 
 	return u, nil
 }
@@ -66,12 +75,42 @@ func (r *queryResolver) Article(ctx context.Context, input model.ArticleInput) (
 	return a, nil
 }
 
+func (r *queryResolver) MostLikedArticlesByTag(ctx context.Context, input model.MostLikedArticlesByTagInput) (model.MostLikedArticlesByTagResult, error) {
+	a := []model.Article{}
+
+	err := store.With(ctx).GetMany(
+		store.Collection("articles"),
+		store.Into(&a),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func (r *userResolver) Articles(ctx context.Context, obj *model.User) ([]model.Article, error) {
+	a := []model.Article{}
+
+	log.Printf("obj: %+v\n", obj)
+
+	err := store.With(ctx).GetOne(
+		store.FromRelationship(obj),
+		store.Into(&a),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return a, nil
+}
+
+func (r *userResolver) Articles2(ctx context.Context, obj *model.User) ([]model.Article, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *userResolver) Comments(ctx context.Context, obj *model.User) ([]model.Comment, error) {
-	panic(fmt.Errorf("not implemented"))
+	return nil, nil
 }
 
 // Article returns gen.ArticleResolver implementation.

@@ -9,7 +9,7 @@ exec:
 
 # Generated models
 model:
-  filename: graph/model/gen.go
+  filename: graph/model/model_gen.go
   package: model
 
 # Resolver implementations
@@ -30,6 +30,8 @@ models:
   User:
     fields:
       articles:
+        resolver: true
+      articles2:
         resolver: true
       comments:
         resolver: true

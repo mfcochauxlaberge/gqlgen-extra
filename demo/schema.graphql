@@ -1,22 +1,29 @@
+scalar Time
+
 # Types
 
 type User {
   id: ID!
   username: String!
   articles: [Article!]!
+  articles2: [Article!]!
   comments: [Comment!]!
   likes: [Article!]!
 }
 
 type Article {
   id: ID!
-  createdAt: String!
+  createdAt: Time!
   title: String!
   content: String!
   author: User!
   tags: [Tag!]!
   likes: [User!]!
   comments: [Comment!]!
+}
+
+type ArticleList {
+  articles: [Article]!
 }
 
 type Comment {
@@ -27,7 +34,7 @@ type Comment {
 }
 
 type Tag {
-  label: ID!
+  label: String!
   articles: [Article!]!
 }
 
@@ -38,6 +45,10 @@ type Like {
 
 type NotAuthorized {
   reason: String
+}
+
+type Success {
+  reason: String!
 }
 
 # Queries and mutations
@@ -58,6 +69,15 @@ extend type Query {
 }
 union ArticleResult = Article | NotAuthorized
 
+input MostLikedArticlesByTagInput {
+  limit: Int!
+  tag: String!
+}
+extend type Query {
+  mostLikedArticlesByTag(input: MostLikedArticlesByTagInput!): MostLikedArticlesByTagResult!
+}
+union MostLikedArticlesByTagResult = ArticleList | NotAuthorized
+
 input CreateUserInput {
   username: String!
 }
@@ -69,7 +89,7 @@ union CreateUserResult = User | NotAuthorized
 input PublishArticleInput {
   title: String!
   content: String!
-  tags: [Tag!]
+  tags: [String!]
 }
 extend type Mutation {
   publishArticle(input: PublishArticleInput!): PublishArticleResult!
@@ -92,7 +112,7 @@ input UntagArticleInput {
 extend type Mutation {
   untagArticle(input: UntagArticleInput!): UntagArticleResult!
 }
-union UntagArticleResult = Deleted | NotAuthorized
+union UntagArticleResult = Success | NotAuthorized
 
 input LikeArticleInput {
   articleId: ID!
@@ -110,4 +130,4 @@ input UnlikeArticleInput {
 extend type Mutation {
   unlikeArticle(input: UnlikeArticleInput!): UnlikeArticleResult!
 }
-union UnlikeArticleResult = Deleted | NotAuthorized
+union UnlikeArticleResult = Success | NotAuthorized

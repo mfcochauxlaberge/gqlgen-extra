@@ -1,0 +1,22 @@
+┌──────────┐
+│ Get user │
+└──────────┘
+
+query GetUser {
+	user(input: {id: "u1"}) {
+		__typename
+		... on User {
+			id
+			username
+		}
+	}
+}
+
+{
+	"user": {
+		"__typename": "User",
+		"id": "u1",
+		"username": "user1"
+	}
+}
+

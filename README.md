@@ -32,6 +32,19 @@ This repository offers packages that can be used on a [gqlgen](https://gqlgen.co
 
 ## Packages
 
+### store
+
+`store` is a simple ORM-like library that can help retrieve data from within the resolvers. It uses the information injected into the context to build a query and inject the data into the given value.
+
+#### Setup
+
+Before using the library in your resolvers, you must inject a `Store` object in your context before gqlgen's handler gets executed.
+
+
+#### Usage
+
+In your resolvers, you can call `With` to get a query builder with the necessary information taken from the context.
+
 ### types
 
 `types` offers the following types that can be used in your GraphQL schemas.
