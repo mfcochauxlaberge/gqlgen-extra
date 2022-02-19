@@ -1,0 +1,49 @@
+# Schema files
+schema:
+  - "*.graphql"
+
+# Generated server
+exec:
+  filename: graph/gen/gen.go
+  package: gen
+
+# Generated models
+model:
+  filename: graph/model/model_gen.go
+  package: model
+
+# Resolver implementations
+resolver:
+  layout: follow-schema
+  dir: graph
+  package: graph
+
+# []Thing or []*Thing
+omit_slice_element_pointers: true
+
+# Manual models
+# autobind:
+#   - github.com/mfcochauxlaberge/gqlgen-extra/demo/server/graph/model
+
+# Type mappings between GraphQL and Go
+models:
+  User:
+    fields:
+      articles:
+        resolver: true
+      articles2:
+        resolver: true
+      comments:
+        resolver: true
+  Article:
+    fields:
+      author:
+        resolver: true
+      comments:
+        resolver: true
+  Comment:
+    fields:
+      author:
+        resolver: true
+      article:
+        resolver: true

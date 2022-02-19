@@ -1,0 +1,37 @@
+┌──────────┐
+│ Get user │
+└──────────┘
+
+query GetUser {
+	user(input: {id: "u1"}) {
+		__typename
+		... on User {
+			id
+			username
+			articles {
+				id
+				createdAt
+				title
+				content
+				comments {
+					content
+					author {
+						username
+					}
+				}
+			}
+			comments {
+				id
+				content
+			}
+			likes {
+				article {
+					title
+				}
+			}
+		}
+	}
+}
+
+Failure: graphql: Cannot query field "article" on type "Article". Did you mean "title"?
+
